@@ -1,5 +1,5 @@
-# Base Linux Distribution
-FROM ubuntu:20.04 
+# Base Ubuntu distribution if CUDA GPU is available 
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu20.04 
 
 # Set Work Directory
 WORKDIR /app
@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     python3.9 get-pip.py && \
     rm get-pip.py && \
-    pip install Flask --default-timeout=1000 --no-cache-dir && \
+    pip install flask --default-timeout=1000 --no-cache-dir && \
     pip install awscliv2 --default-timeout=1000 --no-cache-dir && \
     pip install gevent==21.12 --default-timeout=1000 --no-cache-dir && \
     pip install gunicorn --default-timeout=1000 --no-cache-dir && \
@@ -34,7 +34,7 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 
 # Set Path
-ENV PATH="/app:${PATH}"
+ENV PATH="/app${PATH}"
 
 # Install EvaDB
 RUN python3.9 -m pip install evadb 

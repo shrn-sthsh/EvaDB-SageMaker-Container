@@ -1,7 +1,9 @@
 # EvaDB SageMaker Container
-This repository contains the EvaDb containers for use with SageMaker.
+This repository contains the EvaDB containers for use with SageMaker.
 
-This EvaDB container is intended to supports two execution modes on Amazon SageMaker. Training, where EvaDb uses input data to train a new model, and serving, where it accepts HTTP requests and uses the previously trained model to do a prediction.
+This EvaDB container is intended to supports two execution modes on Amazon SageMaker. Training, where EvaDB uses input data to train a new model, and serving, where it accepts HTTP requests and uses the previously trained model to do a prediction.
+
+STATUS: at the moment, the project in incomplete.  The container works, but training support is incomplete and serving is not fully tested.  
 
 ## Table of contents
  * [Build an image](#build-an-image)
@@ -15,7 +17,19 @@ This EvaDB container is intended to supports two execution modes on Amazon SageM
 After cloning into the repository, execute the following command to build the docker image:
 
 ```sh
-docker build -t evadb-sagemaker-container .
+docker build -t evadb-sagemaker-container -f Dockerfile.CUDA .
+```
+
+In the case you want to build the container locally and there is no CUDA GPU available, execute the following alternate command with a different docker file:
+
+```sh
+docker build -t evadb-sagemaker-container -f Dockerfile .
+```
+
+You can then run the container using the following command:
+
+```sh
+docker run -it evadb-sagemaker-container
 ```
 
 Note `evadb-sagemaker-container` will be the name of the Docker image.
