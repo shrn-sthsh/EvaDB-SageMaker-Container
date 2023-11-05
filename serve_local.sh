@@ -1,4 +1,4 @@
-#!/bin/sh
+s#!/bin/sh
 
 image=$1
 
