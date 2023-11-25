@@ -1,0 +1,7 @@
+python-docx==0.8.10
+evadb
+sagemaker
+flask
+awscliv2
+gevent
+gunicorn
