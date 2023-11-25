@@ -1,0 +1,42 @@
+#!/usr/bin/env python3.7
+from __future__ import print_function
+import os
+import json
+import sys
+import traceback
+import pandas as pd
+
+import algorithm
+
+# These are the paths to where SageMaker mounts data in your container.
+input_path = "/app/learning/input/data"
+output_path = "/app/learning/output"
+
+# The function to execute the training.
+def train():
+    print("Starting the training.")
+    try:       
+        # Call on training implemented in alogorithm.py
+        algorithm.run()
+
+        print("Training complete.")
+    except Exception as exc:
+        # Write out an error file. This will be returned as the failureReason
+        # in the DescribeTrainingJob result.
+        trc = traceback.format_exc()
+        with open(os.path.join(output_path, "failure"), "w") as s:
+            s.write("Exception during training: " + str(exc) + "\n" + trc)
+
+        # Printing this causes the exception to be in the training job logs.
+        print("Exception during training: "
+              + str(exc) + "\n" + trc, file=sys.stderr)
+
+        # A non-zero exit code causes the training job to be marked as Failed.
+        sys.exit(255)
+
+
+if __name__ == "__main__":
+    train()
+    
+    # A zero exit code causes the job to be marked a Succeeded.
+    sys.exit(0)

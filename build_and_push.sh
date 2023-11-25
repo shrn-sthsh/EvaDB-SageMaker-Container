@@ -1,52 +1,42 @@
 #!/usr/bin/env bash
 
-# This script shows how to build the Docker image and push it to ECR to be ready for use
-# by SageMaker.
+# This script builds a Docker image and pushes it to 
+# Amazon ECR for use with SageMaker.
 
-# The argument to this script is the image name. This will be used as the image on the local
-# machine and combined with the account and region to form the repository name for ECR.
+# Check if an image name is provided as an argument
 image=$1
-
-if [ "$image" == "" ]
-then
+if [ -z "$image" ]; then
     echo "Usage: $0 <image-name>"
     exit 1
 fi
 
+# Make the train and serve scripts executable
+chmod +x evadb_instance/train
 chmod +x evadb_instance/serve
 
-# Get the account number associated with the current IAM credentials
+# Get the AWS account number associated with the current IAM credentials
 account=$(aws2 sts get-caller-identity --query Account --output text)
-
-if [ $? -ne 0 ]
-then
+if [ $? -ne 0 ]; then
     exit 255
 fi
 
-
-# Get the region defined in the current configuration (default to us-west-2 if none defined)
+# Get the AWS region defined in the current configuration (default to us-west-2 if none defined)
 region=$(aws2 configure get region)
 region=${region:-us-east-1}
 
-
+# Form the full image name including the ECR repository information
 fullname="${account}.dkr.ecr.${region}.amazonaws.com/${image}:latest"
 
-# If the repository doesn't exist in ECR, create it.
-
+# If the repository doesn't exist in ECR, create it
 aws2 ecr describe-repositories --repository-names "${image}" > /dev/null 2>&1
-
-if [ $? -ne 0 ]
-then
+if [ $? -ne 0 ]; then
     aws2 ecr create-repository --repository-name "${image}" > /dev/null
 fi
 
-# Get the login command from ECR and execute it directly
+# Authenticate Docker to the ECR registry
 $(aws2 ecr get-login --region ${region} --no-include-email)
 
-# Build the docker image locally with the image name and then push it to ECR
-# with the full name.
-
-docker build  -t ${image} .
+# Build the Docker image locally, tag it, and push it to ECR
+docker build -t ${image} .
 docker tag ${image} ${fullname}
-
 docker push ${fullname}
