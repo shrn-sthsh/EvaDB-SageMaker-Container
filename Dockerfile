@@ -34,13 +34,14 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 
 # Set Path
-ENV PATH="/app:${PATH}"
+ENV PATH="/app/program:${PATH}"
 
 # Install EvaDB
 RUN python3.9 -m pip install evadb 
 
 # Define folder for EvaDB inference
-COPY /evadb_instance /app
+COPY /evadb_instance /app/program
 
-# Make Serving Executable
-RUN chmod +x /app/serve
+# Make Serving and Training Executable
+RUN chmod +x /app/program/serve
+RUN chmod +x /app/program/train
